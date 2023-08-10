@@ -1,13 +1,16 @@
+import java.util.ArrayList;
+import java.util.List;
+
 public class Request {
     private String requestMethod;
-    private String header;
+    private List<String> header = new ArrayList<>();
     private String body;
 
     public void setRequestMethod(String requestMethod) {
         this.requestMethod = requestMethod;
     }
 
-    public void setHeader(String header) {
+    public void setHeader(List<String> header) {
         this.header = header;
     }
 
@@ -19,7 +22,7 @@ public class Request {
         return requestMethod;
     }
 
-    public String getHeader() {
+    public List<String> getHeader() {
         return header;
     }
 

@@ -15,6 +15,8 @@ public class Server {
     private Map<String, Handler> headerTypes = new HashMap<>();
     private Map<String, Map<String, Handler>> headerMap = new HashMap<>();
 
+    private Request request = new Request();
+
     public void listen(int port) {
         Thread[] threadPool = new Thread[64];
         int cnt = 0;
@@ -102,6 +104,10 @@ public class Server {
                 Files.copy(filePath, out);
                 out.flush();
                 threadStarted = false;
+
+                final var headersLine = in.readLine();
+                request.setRequestMethod(parts[0]);
+
             } catch (IOException e) {
                 e.printStackTrace();
                 return;
