@@ -105,8 +105,19 @@ public class Server {
                 out.flush();
                 threadStarted = false;
 
-                final var headersLine = in.readLine();
                 request.setRequestMethod(parts[0]);
+                final var headersLine = in.readLine();
+                if (headersLine.contains("host")) {
+                    out.write((
+                            "HTTP/1.1 404 Not Found\r\n" +
+                                    "Content-Length: 0\r\n" +
+                                    "Connection: close\r\n" +
+                                    "\r\n"
+                    ).getBytes());
+                    out.flush();
+                    threadStarted = false;
+                    return;
+                }
 
             } catch (IOException e) {
                 e.printStackTrace();
