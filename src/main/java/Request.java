@@ -3,18 +3,18 @@ import java.util.List;
 
 public class Request {
     private String requestMethod;
-    private List<String> header = new ArrayList<>();
-    private String body;
+    private String header;
+    private List<String> body;
 
     public void setRequestMethod(String requestMethod) {
         this.requestMethod = requestMethod;
     }
 
-    public void setHeader(List<String> header) {
+    public void setHeader(String header) {
         this.header = header;
     }
 
-    public void setBody(String body) {
+    public void setBody(List<String> body) {
         this.body = body;
     }
 
@@ -22,11 +22,11 @@ public class Request {
         return requestMethod;
     }
 
-    public List<String> getHeader() {
+    public String getHeader() {
         return header;
     }
 
-    public String getBody() {
+    public List<String> getBody() {
         return body;
     }
 }

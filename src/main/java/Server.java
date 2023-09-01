@@ -6,9 +6,7 @@ import java.net.ServerSocket;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.LocalDateTime;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class Server {
     private boolean threadStarted = false;
@@ -48,8 +46,27 @@ public class Server {
             ) {
                 // read only request line for simplicity
                 // must be in form GET /path HTTP/1.1
-                final var requestLine = in.readLine();
+                final List<String> requestList = new ArrayList<>();
+                final List<String> bodyList = new ArrayList<>();
+                List<String> currentList = requestList;
+                while (in.ready()) {
+                    String s = in.readLine();
+                    if(s.contains("\r\n\r\n")){
+                        currentList = bodyList;
+                    }
+                    currentList.add(s);
+                }
+
+                String requestLine = requestList.get(0);
                 final var parts = requestLine.split(" ");
+
+                request.setRequestMethod(parts[0]);
+
+                requestLine = requestList.get(1);
+                final String[] header = requestLine.split(" ");
+                request.setHeader(header[1]);
+
+                request.setBody(bodyList);
 
                 if (parts.length != 3) {
                     // just close socket
@@ -104,21 +121,6 @@ public class Server {
                 Files.copy(filePath, out);
                 out.flush();
                 threadStarted = false;
-
-                request.setRequestMethod(parts[0]);
-                final var headersLine = in.readLine();
-                if (headersLine.contains("host")) {
-                    out.write((
-                            "HTTP/1.1 404 Not Found\r\n" +
-                                    "Content-Length: 0\r\n" +
-                                    "Connection: close\r\n" +
-                                    "\r\n"
-                    ).getBytes());
-                    out.flush();
-                    threadStarted = false;
-                    return;
-                }
-
             } catch (IOException e) {
                 e.printStackTrace();
                 return;
@@ -126,8 +128,8 @@ public class Server {
         }
     }
 
-    public void addHandler(String get, String s, Handler handler) {
-        headerTypes.put(s, handler);
-        headerMap.put(get, headerTypes);
+    public void addHandler(String reqType, String path, Handler handler) {
+        headerTypes.put(path, handler);
+        headerMap.put(reqType, headerTypes);
     }
 }
