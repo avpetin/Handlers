@@ -14,6 +14,10 @@ public class Server {
     private Map<String, Map<String, Handler>> headerMap = new HashMap<>();
 
     private Request request = new Request();
+    private String mimeType;
+    private long length = 0L;
+    private String responseStatus;
+    private String content;
 
     public void listen(int port) {
         Thread[] threadPool = new Thread[64];
@@ -76,50 +80,30 @@ public class Server {
 
                 final var path = parts[1];
                 if (!validPaths.contains(path)) {
-                    out.write((
-                            "HTTP/1.1 404 Not Found\r\n" +
-                                    "Content-Length: 0\r\n" +
-                                    "Connection: close\r\n" +
-                                    "\r\n"
-                    ).getBytes());
-                    out.flush();
+                    responseStatus = "HTTP/1.1 404 Not Found\r\n";
+                    length = 0;
                     threadStarted = false;
                     return;
                 }
 
                 final var filePath = Path.of(".", "public", path);
-                final var mimeType = Files.probeContentType(filePath);
+                mimeType = Files.probeContentType(filePath);
 
                 // special case for classic
                 if (path.equals("/classic.html")) {
+                    responseStatus = "HTTP/1.1 200 OK\r\n";
                     final var template = Files.readString(filePath);
-                    final var content = template.replace(
+                    content = template.replace(
                             "{time}",
                             LocalDateTime.now().toString()
-                    ).getBytes();
-                    out.write((
-                            "HTTP/1.1 200 OK\r\n" +
-                                    "Content-Type: " + mimeType + "\r\n" +
-                                    "Content-Length: " + content.length + "\r\n" +
-                                    "Connection: close\r\n" +
-                                    "\r\n"
-                    ).getBytes());
-                    out.write(content);
-                    out.flush();
+                    );
                     threadStarted = false;
                     return;
                 }
 
-                final var length = Files.size(filePath);
-                out.write((
-                        "HTTP/1.1 200 OK\r\n" +
-                                "Content-Type: " + mimeType + "\r\n" +
-                                "Content-Length: " + length + "\r\n" +
-                                "Connection: close\r\n" +
-                                "\r\n"
-                ).getBytes());
+                length = Files.size(filePath);
+                responseStatus = "HTTP/1.1 200 OK\r\n";
                 Files.copy(filePath, out);
-                out.flush();
                 threadStarted = false;
             } catch (IOException e) {
                 e.printStackTrace();
@@ -131,5 +115,21 @@ public class Server {
     public void addHandler(String reqType, String path, Handler handler) {
         headerTypes.put(path, handler);
         headerMap.put(reqType, headerTypes);
+    }
+
+    public String getContentType(){
+        return mimeType;
+    }
+
+    public long getLength(){
+        return length;
+    }
+
+    public String getResponseStatus(){
+        return responseStatus;
+    }
+
+    public String getContent(){
+        return content;
     }
 }

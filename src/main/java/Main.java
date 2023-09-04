@@ -1,4 +1,5 @@
 import java.io.BufferedOutputStream;
+import java.io.IOException;
 
 public class Main { //https://selectel.ru/blog/http-request/
     public static void main(String[] args){
@@ -7,14 +8,20 @@ public class Main { //https://selectel.ru/blog/http-request/
 
         // добавление хендлеров (обработчиков)
         server.addHandler("GET", "/messages", new Handler() {
-            public void handle(Request request, BufferedOutputStream responseStream) {
+            public void handle(Request request, BufferedOutputStream responseStream) throws IOException {
                 // TODO: handlers code
-                "HTTP/1.1 200 OK\r\n" +
-                        "Content-Type: " + mimeType + "\r\n" +
-                        "Content-Length: " + length + "\r\n" +
-                        "Connection: close\r\n" +
-                        "\r\n"
-
+                responseStream.write((
+                        server.getResponseStatus() +
+                                "Content-Type: " + server.getContentType() + "\r\n" +
+                                "Content-Length: " + server.getLength() + "\r\n" +
+                                "Connection: close\r\n" +
+                                "\r\n"
+                ).getBytes());
+                if(server.getLength() > 0){
+                    responseStream.write(server.getContent()
+                            .getBytes());
+                }
+                responseStream.flush();
             }
         });
 
