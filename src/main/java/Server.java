@@ -139,7 +139,7 @@ public class Server {
                 }
 
                 length = Files.size(filePath);
- //               responseStatus = "HTTP/1.1 200 OK\r\n";
+//                responseStatus = "HTTP/1.1 200 OK\r\n";
 //                Handler handler = getHandler(request);
                 out.write((
                         "HTTP/1.1 200 OK\r\n" +
@@ -152,7 +152,7 @@ public class Server {
                 out.flush();
                 threadStarted = false;
 
-                HttpClient httpClient = (HttpClient) HttpClient.newBuilder();
+//                HttpClient httpClient = (HttpClient) HttpClient.newBuilder();
             } catch (IOException e) {
                 e.printStackTrace();
                 return;
