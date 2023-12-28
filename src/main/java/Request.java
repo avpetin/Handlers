@@ -1,7 +1,7 @@
 import java.util.ArrayList;
 import java.util.List;
 
-public class Request {
+public class Request { //https://selectel.ru/blog/http-request/
     private String requestMethod;
     private String header;
     private List<String> body;
