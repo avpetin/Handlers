@@ -1,3 +1,6 @@
+
+import org.apache.http.client.utils.URLEncodedUtils;
+
 import java.io.BufferedOutputStream;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -27,6 +30,9 @@ public class Response {
         if (!validPaths.contains(path)) {
             requestNotFound(out, path);
         }
+
+        path = getQueryParam(path, "UTF-8");
+
         // special case for classic
         switch(path){
             case "/classic.html":
@@ -45,6 +51,11 @@ public class Response {
         Files.copy(filePath, out);
         out.flush();
     }
+
+    private String getQueryParam(String name){
+        return URLEncodedUtils.parse(name, "UTF-8");
+    }
+
 
     private void requestNotFound(BufferedOutputStream out, String path) throws IOException{
         if (!validPaths.contains(path)) {
