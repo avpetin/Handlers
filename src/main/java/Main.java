@@ -9,7 +9,6 @@ public class Main {
 
         // добавление хендлеров (обработчиков)
         Response response = new Response();
-//        for(String s : Response.validPaths){
         server.addHandler("GET", "/messages", new Handler() {
             public void handle(Request request, BufferedOutputStream responseStream) throws IOException {
                 // TODO: handlers code
@@ -23,7 +22,6 @@ public class Main {
                 response.sendResponse(Path.of(request.getPath()), responseStream);
             }
         });
-//        }
 
         server.listen(9999);
     }

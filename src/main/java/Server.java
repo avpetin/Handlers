@@ -57,15 +57,15 @@ public class Server {
     public void addHandler(String reqType, String path, Handler handler) {
         handlerMap.put(path, handler);
         handlers.put(reqType, handlerMap);
+        //        for(String s : Response.validPaths){
     }
 
     public Handler getHandler(Request request, String path) {
         for (Map.Entry<String, Map<String, Handler>> entry : handlers.entrySet()) {
-            String rm = request.getRequestMethod();
-            String key = entry.getKey();
-            if (rm.equals(key)) {
+            if (request.getRequestMethod().equals(entry.getKey())) {
                 for (Map.Entry<String, Handler> handlerEntry : entry.getValue().entrySet()) {
-                    if (handlerEntry.getKey().contains(path))
+                    String key = handlerEntry.getKey().substring(1);
+                    if (path.contains(key))
                         return handlerEntry.getValue();
                 }
                 break;
