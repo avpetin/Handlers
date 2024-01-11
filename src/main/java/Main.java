@@ -1,29 +1,29 @@
 import java.io.BufferedOutputStream;
 import java.io.IOException;
+import java.nio.file.Path;
 
 public class Main {
-    public static void main(String[] args){
+    public static void main(String[] args) {
         final var server = new Server();
         // код инициализации сервера (из вашего предыдущего ДЗ)
 
         // добавление хендлеров (обработчиков)
-        for(String s : Response.validPaths){
-            server.addHandler("GET", s, new Handler() {
-                public void handle(Request request, BufferedOutputStream responseStream) throws IOException {
-                    // TODO: handlers code
-                    Response response = new Response();
-                    response.parseRequest(responseStream, s);
-                }
-            });
+        Response response = new Response();
+//        for(String s : Response.validPaths){
+        server.addHandler("GET", "/messages", new Handler() {
+            public void handle(Request request, BufferedOutputStream responseStream) throws IOException {
+                // TODO: handlers code
+                response.sendResponse(Path.of(request.getPath()), responseStream);
+            }
+        });
 
-            server.addHandler("POST", s, new Handler() {
-                public void handle(Request request, BufferedOutputStream responseStream) throws IOException {
-                    // TODO: handlers code
-                    Response response = new Response();
-                    response.parseRequest(responseStream, s);
-                }
-            });
-        }
+        server.addHandler("POST", "/messages", new Handler() {
+            public void handle(Request request, BufferedOutputStream responseStream) throws IOException {
+                // TODO: handlers code
+                response.sendResponse(Path.of(request.getPath()), responseStream);
+            }
+        });
+//        }
 
         server.listen(9999);
     }
