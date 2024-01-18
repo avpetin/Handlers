@@ -10,14 +10,14 @@ public class Request {                                                          
     private String method;
     private String path;
     private List<String> headers;
-    private List<String> body;
+    private String body;
     private RequestParser parser;
 
     public Request() {
         parser = new RequestParser();
     }
 
-    public Request(String method, List<String> headers, List<String> body) {
+    public Request(String method, List<String> headers, String body) {
         this.method = method;
         this.headers = headers;
         this.body = body;
@@ -35,7 +35,7 @@ public class Request {                                                          
         this.path = path;
     }
 
-    public void setBody(List<String> body) {
+    public void setBody(String body) {
         this.body = body;
     }
 
@@ -51,7 +51,7 @@ public class Request {                                                          
         return path;
     }
 
-    public List<String> getBody() {
+    public String getBody() {
         return body;
     }
 
@@ -60,8 +60,14 @@ public class Request {                                                          
     }
 
     public String getQueryParam(String name) {
-        String[] parts = name.split("\\?");
-        return parts[0];
+        String value = null;
+        List<NameValuePair> params = URLEncodedUtils.parse(body, StandardCharsets.UTF_8);
+        for (NameValuePair param : params) {
+            if (param.getName() == name) {
+                value = param.getValue();
+            }
+        }
+        return value;
     }
 
     public List<NameValuePair> getQueryParams() {
