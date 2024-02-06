@@ -4,13 +4,18 @@ import java.nio.charset.StandardCharsets;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.utils.URLEncodedUtils;
 
+import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class Request {                                                          //https://selectel.ru/blog/http-request/
     private String method;
     private String path;
     private List<String> headers;
     private String body;
+    private List<NameValuePair> queryList = new ArrayList<>();
+    private String query;
     private RequestParser parser;
 
     public Request() {
@@ -32,7 +37,11 @@ public class Request {                                                          
     }
 
     public void setPath(String path) {
-        this.path = path;
+        String[] parts = path.split("\\?");
+        query = parts[1];
+        queryList = getQueryParams();
+        final var filePath = Path.of(".", parts[0]);
+        this.path = filePath.toString();
     }
 
     public void setBody(String body) {
@@ -59,11 +68,11 @@ public class Request {                                                          
         return parser.parseRequest(in, out);
     }
 
-    public String getQueryParam(String name) {
+    private String getQueryParam(String name) {
         String value = null;
-        List<NameValuePair> params = URLEncodedUtils.parse(body, StandardCharsets.UTF_8);
+        List<NameValuePair> params = URLEncodedUtils.parse(query, StandardCharsets.UTF_8);
         for (NameValuePair param : params) {
-            if (param.getName() == name) {
+            if (param.getName().equals(name)) {
                 value = param.getValue();
             }
         }
@@ -71,7 +80,7 @@ public class Request {                                                          
     }
 
     public List<NameValuePair> getQueryParams() {
-        return URLEncodedUtils.parse(path, StandardCharsets.UTF_8);
+        return URLEncodedUtils.parse(query, StandardCharsets.UTF_8);
     }
 
     public Request build() {

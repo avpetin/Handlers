@@ -1,17 +1,18 @@
 import java.io.*;
 import java.net.ServerSocket;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 public class Server {
-    private final Map<String, Map<String, Handler>> handlers;
-    private final Map<String, Handler> handlerMap = new HashMap<>();
+    private final ConcurrentHashMap<String, ConcurrentHashMap<String, Handler>> handlers;
+    private final ConcurrentHashMap<String, Handler> handlerMap = new ConcurrentHashMap<>();
     private Request request;
     private AtomicBoolean threadEnded;
     private int cnt = 0;
 
     public Server() {
-        handlers = new HashMap<>();
+        handlers = new ConcurrentHashMap<>();
         threadEnded = new AtomicBoolean();
     }
 
@@ -61,7 +62,7 @@ public class Server {
     }
 
     public Handler getHandler(Request request, String path) {
-        for (Map.Entry<String, Map<String, Handler>> entry : handlers.entrySet()) {
+        for (Map.Entry<String, ConcurrentHashMap<String, Handler>> entry : handlers.entrySet()) {
             if (request.getRequestMethod().equals(entry.getKey())) {
                 for (Map.Entry<String, Handler> handlerEntry : entry.getValue().entrySet()) {
                     String key = handlerEntry.getKey().substring(1);
