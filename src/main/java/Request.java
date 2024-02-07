@@ -38,9 +38,11 @@ public class Request {                                                          
 
     public void setPath(String path) {
         String[] parts = path.split("\\?");
-        query = parts[1];
-        queryList = getQueryParams();
-        final var filePath = Path.of(".", parts[0]);
+        if(parts.length > 1) {
+            query = parts[1];
+            queryList = getQueryParams();
+        }
+        final var filePath = Path.of(".", "/messages", parts[0]);
         this.path = filePath.toString();
     }
 
